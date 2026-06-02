@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Toska - Stock</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Verificación de sesión: si no hay sesión, redirigir a login -->
+    <script>
+        (async function() {
+            try {
+                const res = await fetch('api/auth_session.php');
+                const data = await res.json();
+                if (!data.logged_in) {
+                    window.location.href = 'login.html';
+                }
+            } catch(e) {
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+
+    <div class="layout dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar card">
+            <div class="logo">la toska</div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-target="view-stock">
+                    <i data-lucide="package"></i>
+                    <span>Stock</span>
+                </button>
+                <button class="nav-item" data-target="view-calendar">
+                    <i data-lucide="calendar"></i>
+                    <span>Calendario</span>
+                </button>
+                <button class="nav-item" data-target="view-sales">
+                    <i data-lucide="pie-chart"></i>
+                    <span>Ventas</span>
+                </button>
+            </nav>
+
+            <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+                <button id="btn-logout" class="nav-item" style="color: #ef4444; width: 100%;">
+                    <i data-lucide="log-out"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Top Navigation (Now just actions/profile placeholder) -->
+            <header class="top-nav card dashboard-header">
+                <div class="header-title">
+                    <h2 id="current-view-title">Control de Stock</h2>
+                </div>
+                <div class="nav-actions" style="display: flex; align-items: center;">
+                    <!-- Widget Dolar -->
+                    <div class="dollar-widget" id="dollar-widget">
+                        <i data-lucide="dollar-sign"></i>
+                        <div class="dollar-info">
+                            <span class="dollar-title">Dólar Blue</span>
+                            <span class="dollar-value" id="dollar-value">Calculando...</span>
+                        </div>
+                    </div>
+
+                    <div class="user-profile" id="user-profile-display">
+                        <div class="avatar" id="user-avatar">
+                            <i data-lucide="user"></i>
+                        </div>
+                        <span id="user-name-display">Cargando...</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- VIEWS CONTAINER -->
+            <div class="views-container">
+
+                <!-- VIEW: STOCK (Active by default) -->
+                <main id="view-stock" class="content-card card view-section active-view">
+                    <div class="content-header">
+                        <div class="title-section">
+                            <i data-lucide="package" class="icon-package"></i>
+                            <h1>Stock Disponible</h1>
+                        </div>
+                        <div class="actions">
+                            <button id="btn-add-product" class="btn btn-primary">
+                                <i data-lucide="plus"></i>
+                                Agregar Producto
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Area -->
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Marca</th>
+                                    <th>Colección</th>
+                                    <th>Tipo de prenda</th>
+                                    <th>Talle</th>
+                                    <th>Color</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Empty list state -->
+                                <tr class="empty-state-row">
+                                    <td colspan="8">
+                                        <div class="empty-state">
+                                            No hay productos en stock. Agrega tu primer producto.
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+
+                <!-- VIEW: CALENDAR -->
+                <main id="view-calendar" class="content-card card view-section">
+                    <div class="content-header">
+                        <div class="title-section">
+                            <i data-lucide="calendar" class="icon-package" style="color: #6366f1;"></i>
+                            <h1>Calendario</h1>
+                        </div>
+                        <div class="actions">
+                            <button id="btn-add-event" class="btn btn-primary" style="background-color: #6366f1;">
+                                <i data-lucide="plus"></i>
+                                Nuevo Evento
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-container">
+                        <!-- Calendar UI will be injected/styled here -->
+                        <div class="calendar-header-nav">
+                            <button id="btn-prev-month" class="btn-icon"><i data-lucide="chevron-left"></i></button>
+                            <h2 id="current-month-display">Marzo 2026</h2>
+                            <button id="btn-next-month" class="btn-icon"><i data-lucide="chevron-right"></i></button>
+                        </div>
+                        <div class="calendar-grid">
+                            <!-- Los días y el contenido serán inyectados dinámicamente por JS (app.js) -->
+                        </div>
+                    </div>
+                </main>
+
+                <!-- VIEW: SALES -->
+                <main id="view-sales" class="content-card card view-section">
+                    <div class="content-header">
+                        <div class="title-section">
+                            <i data-lucide="pie-chart" class="icon-package" style="color: #f59e0b;"></i>
+                            <h1>Resumen de Ventas</h1>
+                        </div>
+                        <div class="actions">
+                            <button id="btn-add-sale" class="btn btn-primary" style="background-color: #f59e0b;">
+                                <i data-lucide="shopping-cart"></i>
+                                Registrar Venta
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sales-dashboard">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3>Total Contado</h3>
+                                <p id="total-contado" class="stat-value">$0.00</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Total Débito</h3>
+                                <p id="total-debito" class="stat-value">$0.00</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Total Crédito</h3>
+                                <p id="total-credito" class="stat-value">$0.00</p>
+                            </div>
+                            <div class="stat-card stat-total">
+                                <h3>Ingresos Totales</h3>
+                                <p id="total-general" class="stat-value">$0.00</p>
+                            </div>
+                        </div>
+
+                        <div class="table-container" style="margin-top: 2rem;">
+                            <table class="data-table" id="sales-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Producto(s)</th>
+                                        <th>Método</th>
+                                        <th>Total</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="empty-state-row-sales">
+                                        <td colspan="5">
+                                            <div class="empty-state">No hay ventas registradas aún.</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </main>
+
+            </div> <!-- /views-container -->
+        </div> <!-- /main-content -->
+    </div>
+
+    <!-- Modal Agregar Producto -->
+    <div id="modal-product" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Agregar Producto</h3>
+                <button type="button" id="btn-close-modal" class="btn-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="form-product">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="p-marca">Marca</label>
+                            <div class="input-container">
+                                <select id="p-marca" required>
+                                    <option value="" disabled selected>Seleccione marca</option>
+                                    <!-- Options populated by JS -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="p-coleccion">Colección</label>
+                            <div class="input-container">
+                                <select id="p-coleccion" required>
+                                    <option value="" disabled selected>Seleccione colección</option>
+                                    <!-- Options populated by JS -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="p-tipo">Tipo de prenda</label>
+                            <div class="input-container">
+                                <select id="p-tipo" required>
+                                    <option value="" disabled selected>Seleccione tipo</option>
+                                    <!-- Options populated by JS -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="p-talle">Talle</label>
+                            <div class="input-container">
+                                <input type="text" id="p-talle" required placeholder="Ej. L">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="p-color">Color</label>
+                            <div class="input-container">
+                                <input type="text" id="p-color" required placeholder="Ej. Negro">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="p-cantidad">Cantidad</label>
+                            <div class="input-container">
+                                <input type="number" id="p-cantidad" required min="1" placeholder="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-precio">Precio ($)</label>
+                        <div class="input-container">
+                            <input type="number" id="p-precio" required min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn-cancel-modal" class="btn btn-outline">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Registrar Venta -->
+    <div id="modal-sale" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Registrar Venta</h3>
+                <button type="button" id="btn-close-modal-sale" class="btn-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="form-sale">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="s-marca">Marca</label>
+                            <div class="input-container">
+                                <input type="text" id="s-marca" required placeholder="Ej. Nike">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="s-coleccion">Colección</label>
+                            <div class="input-container">
+                                <input type="text" id="s-coleccion" required placeholder="Ej. Verano 2026">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="s-tipo">Tipo de prenda</label>
+                            <div class="input-container">
+                                <input type="text" id="s-tipo" required placeholder="Ej. Remera">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="s-talle">Talle</label>
+                            <div class="input-container">
+                                <input type="text" id="s-talle" required placeholder="Ej. L">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="s-color">Color</label>
+                            <div class="input-container">
+                                <input type="text" id="s-color" required placeholder="Ej. Negro">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="s-cantidad">Cantidad</label>
+                            <div class="input-container">
+                                <input type="number" id="s-cantidad" required min="1" placeholder="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Método de Pago</label>
+                        <div class="method-buttons">
+                            <button type="button" class="method-btn active" data-method="Contado">Efectivo</button>
+                            <button type="button" class="method-btn" data-method="Débito">Débito</button>
+                            <button type="button" class="method-btn" data-method="Crédito">Crédito</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="s-total">Total a Cobrar ($)</label>
+                        <div class="input-container">
+                            <input type="number" id="s-total" required min="1" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn-cancel-modal-sale" class="btn btn-outline">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Venta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Evento -->
+    <div id="modal-event" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Nuevo Evento</h3>
+                <button type="button" id="btn-close-modal-event" class="btn-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="form-event">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="e-titulo">Título del Evento</label>
+                        <div class="input-container">
+                            <input type="text" id="e-titulo" required placeholder="Ej. Reunión de Equipo">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="e-fecha">Fecha</label>
+                            <div class="input-container">
+                                <input type="date" id="e-fecha" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="e-color">Color (opcional)</label>
+                            <div class="input-container" style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="color" id="e-color" value="#6366f1"
+                                    style="padding: 0; width: 40px; height: 40px; border: none; cursor: pointer; background: transparent;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn-cancel-modal-event" class="btn btn-outline">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Initialize Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
