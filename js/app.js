@@ -83,7 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
             widget.textContent = `$${data.venta}`;
         } catch (error) {
             console.error('Error al obtener el dólar:', error);
-            document.getElementById('dollar-value').textContent = 'API Error';
+            const w = document.getElementById('dollar-value');
+            w.textContent = 'No disponible';
+            w.title = 'No se pudo obtener la cotización. Verificá tu conexión a internet.';
         }
     }
 
@@ -359,8 +361,14 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCalendar(holidays);
         } catch (error) {
             console.error('Error al obtener feriados:', error);
-            // Si hay error, generamos el calendario sin mostrar los feriados
             renderCalendar([]);
+            const grid = document.querySelector('.calendar-grid');
+            if (grid) {
+                const notice = document.createElement('div');
+                notice.style.cssText = 'grid-column:1/-1;text-align:center;padding:8px;font-size:12px;color:#b45309;background:#fef3c7;border-radius:6px;margin-bottom:4px;';
+                notice.textContent = '⚠️ No se pudieron cargar los feriados. El calendario funciona con eventos personalizados.';
+                grid.prepend(notice);
+            }
         }
     }
 

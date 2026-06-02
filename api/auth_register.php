@@ -5,7 +5,6 @@ require_once 'db.php';
 
 header('Content-Type: application/json');
 
-// Solo aceptar POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Método no permitido']);
@@ -40,37 +39,46 @@ if ($password !== $password_confirm) {
     exit;
 }
 
-// Verificar que el email no exista
-$stmt = $pdo->prepare('SELECT id_usuario FROM usuarios WHERE email = ?');
-$stmt->execute([$email]);
+try {
+    $pdo->beginTransaction();
 
-if ($stmt->fetch()) {
-    echo json_encode(['success' => false, 'message' => 'Ya existe una cuenta con ese email']);
-    exit;
+    // Verificar que el email no exista
+    $stmt = $pdo->prepare('SELECT id_usuario FROM usuarios WHERE email = ?');
+    $stmt->execute([$email]);
+
+    if ($stmt->fetch()) {
+        $pdo->rollBack();
+        echo json_encode(['success' => false, 'message' => 'Ya existe una cuenta con ese email']);
+        exit;
+    }
+
+    // Hashear contraseña e insertar
+    $hash = password_hash($password, PASSWORD_BCRYPT);
+    $stmt = $pdo->prepare('INSERT INTO usuarios (nombre, email, password_hash, auth_provider) VALUES (?, ?, ?, ?)');
+    $stmt->execute([$nombre, $email, $hash, 'local']);
+    $userId = $pdo->lastInsertId();
+
+    $pdo->commit();
+
+    // Iniciar sesión
+    $_SESSION['user_id'] = $userId;
+    $_SESSION['user_name'] = $nombre;
+    $_SESSION['user_email'] = $email;
+    $_SESSION['user_avatar'] = null;
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Registro exitoso',
+        'user' => [
+            'id' => $userId,
+            'nombre' => $nombre,
+            'email' => $email,
+            'avatar_url' => null
+        ]
+    ]);
+
+} catch (Exception $e) {
+    $pdo->rollBack();
+    echo json_encode(['success' => false, 'message' => 'Error al registrar usuario. Intentá de nuevo.']);
 }
-
-// Hashear contraseña e insertar
-$hash = password_hash($password, PASSWORD_BCRYPT);
-
-$stmt = $pdo->prepare('INSERT INTO usuarios (nombre, email, password_hash, auth_provider) VALUES (?, ?, ?, ?)');
-$stmt->execute([$nombre, $email, $hash, 'local']);
-
-$userId = $pdo->lastInsertId();
-
-// Iniciar sesión
-$_SESSION['user_id'] = $userId;
-$_SESSION['user_name'] = $nombre;
-$_SESSION['user_email'] = $email;
-$_SESSION['user_avatar'] = null;
-
-echo json_encode([
-    'success' => true,
-    'message' => 'Registro exitoso',
-    'user' => [
-        'id' => $userId,
-        'nombre' => $nombre,
-        'email' => $email,
-        'avatar_url' => null
-    ]
-]);
 ?>

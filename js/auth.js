@@ -79,6 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('register-password').value;
         const passwordConfirm = document.getElementById('register-password-confirm').value;
         if (!nombre || !email || !password || !passwordConfirm) { showError('register-error', 'Completá todos los campos'); return; }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) { showError('register-error', 'El email no tiene un formato válido'); return; }
         if (password.length < 6) { showError('register-error', 'La contraseña debe tener al menos 6 caracteres'); return; }
         if (password !== passwordConfirm) { showError('register-error', 'Las contraseñas no coinciden'); return; }
         const btn = registerForm.querySelector('.btn-login');
