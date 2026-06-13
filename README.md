@@ -1,18 +1,16 @@
 # 🛍️ La Toska — Sistema de Gestión de Stock y Ventas
 
-Sistema web de administración interna para el local de indumentaria femenina **"La Toska"**, ubicado en Mendoza, Argentina. Diseñado para ejecutarse de forma local en el negocio mediante XAMPP.
+Sistema web de administración interna para el local de indumentaria femenina **"La Toska"**, ubicado en Mendoza, Argentina. Diseñado para ejecutarse de forma local en el negocio mediante XAMPP en **Windows**.
 
 ---
 
 ## 👥 Integrantes — Grupo 7
 
-| Integrante | GitHub |
-|------------|--------|
-| Becerra, Micaela | — |
-| Laspada, Gonzalo | — |
-| López Videla, Maximiliano | [@MaxiLopezVidela](https://github.com/MaxiLopezVidela) |
-| Malanca, Luciano | — |
-| Rossi, Franco | — |
+- Becerra, Micaela
+- Laspada, Gonzalo
+- López Videla, Maximiliano
+- Malanca, Luciano
+- Rossi, Franco
 
 **Universidad Nacional de Cuyo — Metodología y Testing — 2026**
 
@@ -45,42 +43,46 @@ La Toska utilizaba planillas de Excel para registrar productos y ventas. Este si
 
 ## 📋 Requisitos previos
 
-- [XAMPP](https://www.apachefriends.org/) con PHP 8.2 y MariaDB 10.4 o superior
-- Navegador web moderno (Chrome, Firefox o Edge)
-- Conexión a internet (para APIs externas: feriados y dólar blue)
+- **[XAMPP](https://www.apachefriends.org/download.html)** — servidor local con PHP 8.2 y MariaDB 10.4 o superior
+- **Navegador web moderno** (Chrome, Firefox o Edge)
+- **Conexión a internet** (para APIs externas: feriados y dólar blue)
+
+> ⚠️ Esta aplicación está pensada para ejecutarse en **Windows** con XAMPP. También funciona en macOS siguiendo los mismos pasos.
 
 ---
 
 ## 🚀 Instalación y ejecución
 
-### 1. Clonar el repositorio
+### 1. Instalar XAMPP
+
+1. Descargar XAMPP desde [https://www.apachefriends.org/download.html](https://www.apachefriends.org/download.html)
+2. Ejecutar el instalador `.exe` y seguir el asistente (Next, Next, Finish)
+3. Abrir el **Panel de Control de XAMPP** e iniciar **Apache** y **MySQL**
+
+### 2. Clonar el repositorio
 
 ```bash
 git clone https://github.com/MaxiLopezVidela/LaToska.git
 ```
 
-### 2. Copiar al servidor local
+### 3. Copiar al servidor local
 
 Copiar la carpeta del proyecto a la carpeta `htdocs` de XAMPP:
 
 ```
-/Applications/XAMPP/xamppfiles/htdocs/latoska/   ← macOS
-C:\xampp\htdocs\latoska\                          ← Windows
+C:\xampp\htdocs\latoska\          ← Windows
+/Applications/XAMPP/htdocs/latoska/  ← macOS
 ```
-
-### 3. Iniciar XAMPP
-
-Abrir el panel de control de XAMPP e iniciar **Apache** y **MySQL**.
 
 ### 4. Crear la base de datos
 
-1. Abrir [phpMyAdmin](http://localhost/phpmyadmin)
+1. Abrir [phpMyAdmin](http://localhost/phpmyadmin) en el navegador
 2. Crear una base de datos llamada `latoska`
 3. Importar el archivo `BaseDatosLaToska.sql` desde la raíz del proyecto
 
 ### 5. Crear usuario administrador
 
-Ejecutar el siguiente SQL en phpMyAdmin:
+Ejecutar el siguiente SQL en phpMyAdmin → pestaña SQL:
 
 ```sql
 INSERT INTO usuarios (nombre, email, password_hash, auth_provider)
@@ -153,6 +155,10 @@ LaToska/
 │   ├── guia_usuario.md         # Guía de uso del sistema
 │   ├── documentacion_tecnica.md# Arquitectura y decisiones técnicas
 │   └── pruebas_regresion.md    # Reporte de pruebas de regresión
+├── testing/
+│   ├── tests/regression.spec.js# Suite de pruebas automatizadas
+│   ├── evidencias/             # Capturas de pantalla por caso de prueba
+│   └── playwright-report/      # Reporte HTML de Playwright
 ├── login.html                  # Pantalla de inicio de sesión y registro
 ├── main.html                   # Panel principal del sistema
 ├── BaseDatosLaToska.sql        # Script de creación e inicialización de BD
@@ -163,7 +169,7 @@ LaToska/
 
 ## 🧪 Pruebas automatizadas
 
-Las pruebas de regresión se encuentran en la carpeta `testing/` e incluyen 24 casos de prueba automatizados con Playwright cubriendo autenticación, CRUD de productos, navegación, APIs externas y registro de ventas.
+Las pruebas de regresión se encuentran en `testing/` e incluyen 24 casos de prueba automatizados con Playwright cubriendo autenticación, CRUD de productos, navegación, APIs externas y registro de ventas.
 
 Ver el reporte completo en [`docs/pruebas_regresion.md`](docs/pruebas_regresion.md).
 
